@@ -5,9 +5,9 @@ I have used Google's TensorFlow Keras primarily for model training and other Pyt
 
 I got my dataset from Kaggle.
 
-I've created 3 models here, all models are working with around 90 percent accuracy on the test set.
+I've created 3 models here, all working with around 90 percent accuracy on the test set.
 
-Model selection and testing completely depends on the images provided. Models may predict some images incorrectly.
+Model selection and testing completely depend on the images provided. Models may mispredict some pictures.
 
 This project is all open for suggestions. 
 
