@@ -1,60 +1,52 @@
-import tensorflow as tf
+from flask import Flask, request, jsonify
+from keras.models import load_model
+from PIL import Image
 import numpy as np
-from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing import image
-from http.server import SimpleHTTPRequestHandler, HTTPServer
-import cgi
-import os
-from urllib import parse
-import requests
-import json
+from flask_ngrok import run_with_ngrok
 
+app = Flask(__name__)
+run_with_ngrok(app)  # Start ngrok
 
-# Download the model from GitHub
-url = 'https://raw.githubusercontent.com/CORNYBUG2/FakevsReal/main/projectthingy.h5'
-response = requests.get(url)
-with open('projectthingy.h5', 'wb') as f:
-    f.write(response.content)
+# Load the model
+model = load_model('https://raw.githubusercontent.com/CORNYBUG2/FakevsReal/refs/heads/main/projectthingy.h5')
 
-# Load your pre-trained model
-model = load_model('projectthingy.h5')
+def preprocess_image(image):
+    image = image.resize((224, 224))
+    image = np.array(image) / 255.0
+    image = np.expand_dims(image, axis=0)
+    return image
 
-def preprocess_image(img_path):
-    img = image.load_img(img_path, target_size=(256, 256))
-    img_array = image.img_to_array(img)
-    img_array /= 255.0  # Rescale the values between 0 and 1.
-    img_array = np.expand_dims(img_array, axis=0)
-    return img_array
+@app.route('/', methods=['GET'])
+def index():
+    return '''
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Deepfake Detector</title>
+    </head>
+    <body>
+        <h1>Deepfake Detector</h1>
+        <form method="POST" enctype="multipart/form-data">
+            <input type="file" name="image">
+            <input type="submit" value="Upload">
+        </form>
+    </body>
+    </html>
+    '''
 
-class MyHandler(SimpleHTTPRequestHandler):
-    def do_POST(self):
-        if self.path == '/predict':
-            form = cgi.FieldStorage(
-                fp=self.rfile,
-                headers=self.headers,
-                environ={'REQUEST_METHOD': 'POST'}
-            )
-            file_item = form['file']
-            if file_item.filename:
-                file_path = os.path.join(os.getcwd(), file_item.filename)
-                with open(file_path, 'wb') as f:
-                    f.write(file_item.file.read())
-                preprocessed_image = preprocess_image(file_path)
-                prediction = model.predict(preprocessed_image)
-                result = 'Fake' if prediction > 0.6 else 'Real'
-                os.remove(file_path)  # Clean up the saved file
-                self.send_response(200)
-                self.send_header('Content-type', 'application/json')
-                self.end_headers()
-                self.wfile.write(json.dumps({"message": result}).encode())
-            else:
-                self.send_response(400)
-                self.end_headers()
-        else:
-            super().do_GET()
+@app.route('/', methods=['POST'])
+def predict():
+    if 'image' not in request.files:
+        return jsonify({'error': 'No image file'})
 
-if __name__ == "__main__":
-    port = 8000
-    server = HTTPServer(('0.0.0.0', port), MyHandler)
-    print(f"Starting server on port {port}...")
-    server.serve_forever()
+    file = request.files['image']
+    image = Image.open(file)
+    processed_image = preprocess_image(image)
+
+    prediction = model.predict(processed_image)
+    result = 'Real' if prediction[0][0] > 0.5 else 'Fake'
+
+    return jsonify({'prediction': result})
+
+if __name__ == '__main__':
+    app.run()
