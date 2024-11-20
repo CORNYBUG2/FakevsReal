@@ -6,7 +6,9 @@ from http.server import SimpleHTTPRequestHandler, HTTPServer
 import cgi
 import os
 from urllib import parse
+import requests
 import json
+
 
 # Download the model from GitHub
 url = 'https://raw.githubusercontent.com/CORNYBUG2/FakevsReal/main/projectthingy.h5'
