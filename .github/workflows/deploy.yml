@@ -26,7 +26,7 @@ jobs:
 
     - name: Download model from GitHub
       run: |
-        wget https://raw.githubusercontent.com/<username>/<repo>/<branch>/path/to/your_model.h5 -O projectthingy.h5
+        wget https://raw.githubusercontent.com/CORNYBUG2/FakevsReal/refs/heads/main/projectthingy.h5
 
     - name: Run application
       run: uvicorn main:app --host 0.0.0.0 --port 8000
