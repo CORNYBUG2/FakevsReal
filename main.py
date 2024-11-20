@@ -1,10 +1,12 @@
-from fastapi import FastAPI, File, UploadFile
-from fastapi.middleware.cors import CORSMiddleware
+import tensorflow as tf
+import numpy as np
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
-import numpy as np
+from fastapi import FastAPI, File, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
 import uvicorn
+import requests
 
 app = FastAPI()
 
@@ -17,8 +19,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Download the model from GitHub
+url = 'blob:https://github.com/cf0e81b8-5eba-446e-999d-09a35445e598'
+response = requests.get(url)
+open('projectthingy.h5', 'wb').write(response.content)
+
 # Load your pre-trained model
-model = load_model('D:\\AI project\\pythonProject1\\MODELS\\projectthingy.h5')  # Replace with the actual path to your .h5 model
+model = load_model('projectthingy.h5')
 
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
