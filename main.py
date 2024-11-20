@@ -5,7 +5,6 @@ from tensorflow.keras.preprocessing import image
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
-import uvicorn
 import requests
 
 app = FastAPI()
@@ -20,9 +19,8 @@ app.add_middleware(
 )
 
 # Download the model from GitHub
-thisthing = 'https://raw.githubusercontent.com/CORNYBUG2/FakevsReal/refs/heads/main/projectthingy.h5'
-
-response = requests.get(thisthing)
+url = 'https://raw.githubusercontent.com/CORNYBUG2/FakevsReal/main/projectthingy.h5'
+response = requests.get(url)
 open('projectthingy.h5', 'wb').write(response.content)
 
 # Load your pre-trained model
@@ -43,4 +41,9 @@ async def predict(file: UploadFile = File(...)):
     return {"message": result}
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    import os
+    from fastapi.testclient import TestClient
+
+    client = TestClient(app)
+
+    os.system("python -m http.server 8080")
