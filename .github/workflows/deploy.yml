@@ -35,4 +35,4 @@ jobs:
     - name: Download and Serve Application
       run: |
         wget https://raw.githubusercontent.com/CORNYBUG2/FakevsReal/main/projectthingy.h5 -O projectthingy.h5
-        python predict.py
+        python main.py
