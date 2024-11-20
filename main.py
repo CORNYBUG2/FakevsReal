@@ -20,7 +20,7 @@ app.add_middleware(
 )
 
 # Download the model from GitHub
-url = 'blob:https://github.com/cf0e81b8-5eba-446e-999d-09a35445e598'
+url = 'https://github.com/CORNYBUG2/FakevsReal/blob/9eb920579fffa9159b174ded807ce537ee6a0324/projectthingy.h5'
 response = requests.get(url)
 open('projectthingy.h5', 'wb').write(response.content)
 
