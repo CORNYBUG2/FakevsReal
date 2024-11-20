@@ -20,8 +20,9 @@ app.add_middleware(
 )
 
 # Download the model from GitHub
-url = 'https://github.com/CORNYBUG2/FakevsReal/blob/9eb920579fffa9159b174ded807ce537ee6a0324/projectthingy.h5'
-response = requests.get(url)
+thisthing = 'https://raw.githubusercontent.com/CORNYBUG2/FakevsReal/refs/heads/main/projectthingy.h5'
+
+response = requests.get(thisthing)
 open('projectthingy.h5', 'wb').write(response.content)
 
 # Load your pre-trained model
